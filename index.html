@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Workout Page</title>
+	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-storage.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<style type="text/css">
+		.card-body.embed-responsive {
+			overflow-y: scroll;
+		}
+
+		.draggable {
+			background-color: #f6f6f6;
+			border: 1px solid #e0e0e0;
+			padding: 1rem;
+			cursor: move;
+		}
+
+		.draggable-choice {
+			background-color: #f6f6f6;
+			border: 1px solid #e0e0e0;
+			padding: 1rem;
+			cursor: move;
+			margin-bottom: 0;
+		}
+
+		.btn.btn-default.trash {
+			border: 1px solid #e0e0e0;
+		}
+
+		.btn.btn-default.edit {
+			border: 1px solid #e0e0e0;
+		}
+
+		.drag-point-in-between {
+			background-color: white;
+			padding-top: 7px;
+			padding-bottom: 7px; 
+			margin-bottom: 0;
+		}
+
+	</style>
+
+</head>
+<body>
+	<div class="container">
+		<br>
+		<div class="row">
+			<div class="col-6">
+				Bootcamp name *: <input type="" class="form-control" name="" id="bootcampname">
+			</div>
+			<div class="col-6">
+				Bootcamp level *: <select class="form-control" id="bootcamplevel">
+				<option value="1">Beginner</option>
+				<option value="2">Intermediate</option>
+				<option value="3">Hard</option>
+				</select>
+			</div>
+				
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-12">
+				Description: <textarea class="form-control" id="bootcampdesc"></textarea>
+			</div>
+			
+		</div>
+		<br>
+		<div class="row">
+			<!--<div class="col-12">
+				<div class="input-group">
+				  <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+				  <button type="button" class="btn btn-primary"><i class="fa fa-folder-open" aria-hidden="true"></i> Browse</button>
+				</div>
+			</div>-->
+			<div class="col-12">
+				<input type="file" class="form-control" id="inputGroupFile02" style="display: none;">
+				Bootcamp Picture: 
+				<div class="input-group mb-3">
+				  <input type="text" class="form-control" id="imgFile" readonly>
+				  <label class="input-group-text btn-primary" for="inputGroupFile02"><i class="fa fa-folder-open" aria-hidden="true"></i>&nbsp;&nbsp; Browse</label>
+				</div>
+				<label id="UploadProgress"></label>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-6">
+				<h3>Available Exercises</h3>
+				<div class="row">
+					<div class="col-10"><input type="text" name="" class="form-control" placeholder="Search"></div>
+					<div class="col-2"><button class="btn btn-primary btn-sm" data-bs-toggle="modal" href="#exampleModalToggle">+</button></div>
+				</div>
+				<br>
+				<div class="card" style="height: 300px;">
+					<div class="card-body embed-responsive" id="choices1">
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete1')" ondrop="return false" ondragover="return false" id="drag1"><label>Ab Choppers&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete1" style="display: none;" onclick="deleteItem('drag1','delete1')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Ab Choppers" data-index="0" style="display: none;" id="edit1"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete2')" ondrop="return false" ondragover="return false" id="drag2"><label>Ab Scissors&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete2" style="display: none;" onclick="deleteItem('drag2','delete2')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Ab Scissors" data-index="1" style="display: none;" id="edit2"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete3')" ondrop="return false" ondragover="return false" id="drag3"><label>Arnold Press&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete3" style="display: none;" onclick="deleteItem('drag3','delete3')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Arnold Press" data-index="2" style="display: none;" id="edit3"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete4')" ondrop="return false" ondragover="return false" id="drag4"><label>Ball Slam&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete4" style="display: none;" onclick="deleteItem('drag4','delete4')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Ball Slam" data-index="3" style="display: none;" id="edit4"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete5')" ondrop="return false" ondragover="return false" id="drag5"><label>Ball Toss&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete5" style="display: none;" onclick="deleteItem('drag5','delete5')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Ball Toss" data-index="4" style="display: none;" id="edit5"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete6')" ondrop="return false" ondragover="return false" id="drag6"><label>Battle Rope Alternates&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete6" style="display: none;" onclick="deleteItem('drag6','delete6')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Battle Rope Alternates" data-index="5" style="display: none;" id="edit6"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete7')" ondrop="return false" ondragover="return false" id="drag7"><label>Battle Rope Crosses&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete7" style="display: none;" onclick="deleteItem('drag7','delete7')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Battle Rope Crosses" data-index="6" style="display: none;" id="edit7"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete8')" ondrop="return false" ondragover="return false" id="drag8"><label>Battle Rope Slams&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete8" style="display: none;" onclick="deleteItem('drag8','delete8')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Battle Rope Slams" data-index="7" style="display: none;" id="edit8"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete9')" ondrop="return false" ondragover="return false" id="drag9"><label>Bentover Dumbbell Rows&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete9" style="display: none;" onclick="deleteItem('drag9','delete9')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Bentover Dumbbell Rows" data-index="8" style="display: none;" id="edit9"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete10')" ondrop="return false" ondragover="return false" id="drag10"><label>Bicep Curl&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete10" style="display: none;" onclick="deleteItem('drag10','delete10')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Bicep Curl" data-index="9" style="display: none;" id="edit10"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete11')" ondrop="return false" ondragover="return false" id="drag11"><label>Cable Flies&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete11" style="display: none;" onclick="deleteItem('drag11','delete11')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Cable Flies" data-index="10" style="display: none;" id="edit11"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+						
+						<p class="draggable" draggable="true" ondragstart="drag(event, 'delete12')" ondrop="return false" ondragover="return false" id="drag12"><label>Single Leg Squats&nbsp;&nbsp;</label><button class="btn btn-default trash" id="delete12" style="display: none;" onclick="deleteItem('drag12','delete12')"><i class="fa fa-trash" aria-hidden="true"></i></button><button class="btn btn-default edit" data-bs-toggle="modal" href="#exampleModalToggle2" data-exercise="Single Leg Squats" data-index="11" style="display: none;" id="edit12"><i class="fa fa-edit" aria-hidden="true"></i></button>
+							<input type="hidden" class="exercisereps">
+							<input type="hidden" class="exerciserest">
+							<input type="hidden" class="exerciseset" value="1">
+							<input type="hidden" class="exercisetimed">
+							<input type="hidden" class="demourl">
+							<input type="hidden" class="easy_replace">
+							<input type="hidden" class="hard_replace">
+						</p>
+					</div>
+				</div>
+				<br>
+				<a type="button" class="btn btn-danger" onclick="Reset();">Reset</a>
+			</div>
+			<div class="col-6">
+				<h3>Your Bootcamp *</h3>
+				<div class="card" style="height: 300px;">
+					<div class="card-body embed-responsive" ondrop="drop(event, this)" ondragover="allowDrop(event)" id="list1">
+						
+					</div>
+				</div><br>
+				<div class="row">
+					<div class="col-4">Total Time (in minutes): </div>
+					<div class="col-8"><input type="text" name="" class="form-control" value="0" readonly id="totaltime"></div>
+				</div>
+				<br>
+				<button type="button" class="btn btn-success" id="save">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+	  <div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalToggleLabel">Exercise Addition</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	      	Exercise Name
+	      	<input type="text" name="" class="form-control"><br>
+	      	Demonstration URL
+	      	<input type="text" name="" class="form-control"><br>
+	      	Level
+	      	<select class="form-control">
+	      		<option>Beginner</option>
+	      		<option>Intermediate</option>
+	      		<option>Expert</option>
+	      	</select><br>
+	      	Exercise Targets
+	      	<input type="text" name="" class="form-control"><br>
+	      	Requires Equipment
+	      	<input type="checkbox" name=""><br><br>
+	      	Impact Level
+	        &nbsp;&nbsp;<input type="range" name=""><br>
+	      	<br>
+	      	<b>Focus</b><br><br>
+	      	Cardio
+	        &nbsp;&nbsp;<input type="range" name=""><br>
+	        Chest
+	        &nbsp;&nbsp;<input type="range" name=""><br>
+			Upper Back
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Lower Back
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Triceps
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Biceps
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Shoulders
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Abs
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Glutes
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Quads
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Hamstrings
+			&nbsp;&nbsp;<input type="range" name=""><br>
+			Forearms
+			&nbsp;&nbsp;<input type="range" name=""><br>
+	      </div>
+	      <div class="modal-footer">
+	      	<button class="btn btn-success">Save</button> <button class="btn btn-danger">Reset</button>
+	        <!--<button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">Open second modal</button>-->
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+	  <div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title">Customize</h5> &nbsp; <h5 class="modal-title" id="customizetitle"></h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	      	<input type="hidden" id="paragraphindex">
+	        Time Based set
+	      	<input type="checkbox" name="" id="timebased"><br><br>
+	      	How Long
+	      	<input type="text" name="" class="form-control" placeholder="in reps" id="exerciselength"><br>
+	      	Set Rest Period*
+	      	<input type="text" name="" class="form-control" placeholder="in seconds" id="exerciserest"><br>
+	      	Demonstration URL
+	      	<input type="text" name="" class="form-control" id="demourl"><br>
+	      	Easier replacement*
+	      	<select class="form-control" id="easy">
+	      		<option>Choose a replacements</option>
+	      		<option>Ab Choppers</option>
+	      		<option>Ab Scissors</option>
+	      		<option>Arnold Press</option>
+	      		<option>Ball Slam</option>
+	      		<option>Ball Toss</option>
+	      		<option>Battle Rope Alternate</option>
+	      		<option>Battle Rope Crosses</option>
+	      		<option>Battle Rope Slams</option>
+	      		<option>Bentover Dumbbell Rows</option>
+	      		<option>Bicep Curl</option>
+	      		<option>Cable Flies</option>
+	      		<option>Single Leg Squats</option>
+	      	</select><br>
+	      	More difficult replacement*
+	      	<select class="form-control" id="hard">
+	      		<option>Choose a replacements</option>
+	      		<option>Ab Choppers</option>
+	      		<option>Ab Scissors</option>
+	      		<option>Arnold Press</option>
+	      		<option>Ball Slam</option>
+	      		<option>Ball Toss</option>
+	      		<option>Battle Rope Alternate</option>
+	      		<option>Battle Rope Crosses</option>
+	      		<option>Battle Rope Slams</option>
+	      		<option>Bentover Dumbbell Rows</option>
+	      		<option>Bicep Curl</option>
+	      		<option>Cable Flies</option>
+	      		<option>Single Leg Squats</option>
+	      	</select><br>
+	      </div>
+	      <div class="modal-footer">
+	        <button class="btn btn-primary" id="modalsave">Save</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<br>
+</body>
+</html>
+<script type="text/javascript">
+	var listItems = [];
+	var listItemButton1 = [];
+	var listItemButton2 = [];
+	var orderlistItems = [];
+	var newIndex = 0;
+	var inBetween = 0;
+	var files = [];
+
+	/*function setImageVar(e) {
+		alert("File changed!");
+		files = document.getElementById("");
+		alert(files[0]);
+	}*/
+
+	const fileSelector = document.getElementById('inputGroupFile02');
+	var fileList = 0;
+	  fileSelector.addEventListener('change', (event) => {
+	    fileList = event.target.files;
+	    console.log(fileList);
+	    document.getElementById('imgFile').value = fileList[0]["name"];
+	    alert("Image file added!");
+	  });
+
+	function allowDrop(ev) {
+	  ev.preventDefault();
+	}
+
+	function drag(ev, buttonid) {
+	  ev.dataTransfer.setData("text", ev.target.id);
+	  //document.getElementById(buttonid).style.display = 'inline-block';
+	}
+/*
+	function drop(ev) {
+	  ev.preventDefault();
+	  var data = ev.dataTransfer.getData("text");
+	  ev.target.appendChild(document.getElementById(data));
+	}
+*/
+
+	function drop(ev, el) {
+	  ev.preventDefault();
+	  var data = ev.dataTransfer.getData("text");
+	  // All the commented part are the code ready if ever the system requires no duplication on exercises. 11/01/2021 - Happy halloween!
+
+	  if (data.includes("choice")) {
+	  	 //alert("You dragging the right list!");
+	  	 //const dragEndIndex = +this.getAttribute('data-index');
+	  	 //alert(dragEndIndex);
+	  } else {
+		  var listcontent = document.getElementById("list1");
+		  var paracontents = listcontent.getElementsByTagName("p");
+		  var len = paracontents.length;
+		  var counter = 0;
+
+		  for(var i = 0; i < len; i++) {
+		  	pid = paracontents[i].id;
+		  	if(pid.includes(data + "choice")) {
+		  		counter = counter + 1;
+		  	} 
+		  }
+		  
+		  if(counter > 0) {
+		  	  var nodeCopy = document.getElementById(data).cloneNode(true);
+			  nodeCopy.id = nodeCopy.id + "choice" + counter;
+			  nodeCopy.ondrop = "return false";
+			  el.appendChild(nodeCopy);
+			  var content = document.getElementById(nodeCopy.id);
+			  var buttoncontent = content.getElementsByTagName("button")[0];
+			  var buttoncontent2 = content.getElementsByTagName("button")[1];
+			  buttoncontent.id = buttoncontent.id + "choice" + counter;
+			  buttoncontent2.id = buttoncontent2.id + "choice" + counter;
+			  buttoncontent.style.display = 'inline-block';
+			  buttoncontent2.style.display = 'inline-block';
+			  document.getElementById(buttoncontent.id).setAttribute('onclick',  "deleteItem('" + nodeCopy.id + "', '" + buttoncontent.id + "')");
+			  nodeCopy.setAttribute('class', "draggable-choice");
+			  var newnode = document.createElement("p");
+			  newnode.setAttribute('ondrop', "dropInBetween(event,this)");
+			  newnode.setAttribute('class', "drag-point-in-between"); 
+			  el.appendChild(newnode);
+		  } else {
+			  var nodeCopy = document.getElementById(data).cloneNode(true);
+			  nodeCopy.id = nodeCopy.id + "choice"; /* We cannot use the same ID */
+			  nodeCopy.ondrop = "return false";
+			  el.appendChild(nodeCopy);
+			  var content = document.getElementById(nodeCopy.id);
+			  var buttoncontent = content.getElementsByTagName("button")[0];
+			  var buttoncontent2 = content.getElementsByTagName("button")[1];
+			  buttoncontent.id = buttoncontent.id + "choice";
+			  buttoncontent2.id = buttoncontent2.id + "choice";
+			  buttoncontent.style.display = 'inline-block';
+			  buttoncontent2.style.display = 'inline-block';
+			  document.getElementById(buttoncontent.id).setAttribute('onclick',  "deleteItem('" + nodeCopy.id + "', '" + buttoncontent.id + "')");
+			  nodeCopy.setAttribute('class', "draggable-choice");
+			  var newnode = document.createElement("p");
+			  newnode.setAttribute('ondrop', "dropInBetween(event,this)");
+			  newnode.setAttribute('class', "drag-point-in-between"); 
+			  el.appendChild(newnode);
+		  }
+
+		  var draggable = document.getElementsByClassName("draggable-choice");
+		  for (var j = 0; j < draggable.length; j++) {
+		  	  draggable[j].setAttribute('data-index', j);
+			  draggable[j].setAttribute('ondrop', "swapItems(event, this, " + j + ")");
+			  draggable[j].setAttribute('ondragstart', "dragrightlist(event)");
+		  }
+
+		  var dragpointinbetween = document.getElementsByClassName("drag-point-in-between");
+		  for (var t = 0; t < dragpointinbetween.length; t++) {
+		  	  //dragpointinbetween[t].setAttribute('data-index', t);
+			  dragpointinbetween[t].setAttribute('ondrop', "swapItems(event, this, " + t + ")");
+			  //dragpointinbetween[t].setAttribute('ondragstart', "dragrightlist(event)");
+		  }
+
+		  // rearrange the list based on drag position
+		  array_move(listItems, listItems.length-1, newIndex);
+		  if(typeof listItems[0] == "undefined") {
+		  	console.log("magic");
+		  } else {
+		  	  var draggablechoice1 = document.getElementsByClassName("draggable-choice");
+		  	  
+		  	  for(var k = 0; k < draggablechoice1.length; k++) {
+		  	  	  draggablechoice1[k].getElementsByTagName("label")[0].remove();
+		  	  	  draggablechoice1[k].getElementsByTagName("button")[0].remove();
+		  	  	  draggablechoice1[k].getElementsByTagName("button")[0].remove();
+		  	  	  //console.log(draggablechoice1[k].getElementsByTagName("button")[1]);
+		  	  	  
+		  	  	  var listitemCopy = listItems[k].cloneNode(true);
+		  	      var listitemCopyButton1 = listItemButton1[k].cloneNode(true);
+		  	      var listitemCopyButton2 = listItemButton2[k].cloneNode(true);
+		  	      listitemCopyButton1.style.display = "inline-block";
+		  	      listitemCopyButton1.setAttribute('onclick',  "deleteItem3('" + draggablechoice1[k].id + "', '" + listitemCopyButton1.id + "')");
+		  	      listitemCopyButton2.style.display = "inline-block";
+		  	      listitemCopyButton2.setAttribute('data-exercise',  listitemCopy.innerHTML);
+		  	      listitemCopyButton2.setAttribute('data-index',  k);
+		  	  	  draggablechoice1[k].appendChild(listItems[k].cloneNode(true));
+		  	  	  draggablechoice1[k].appendChild(listitemCopyButton1);
+		  	  	  draggablechoice1[k].appendChild(listitemCopyButton2);
+		  	  	  console.log(k);
+		  	  }
+		  	  listItems = [];
+		  	  listItemButton1 = [];
+		  	  listItemButton2 = [];
+		  }
+		  console.log(listItems);
+		  
+	    }
+
+	}
+
+	function dropInBetween(ev, el, index) {
+		inBetween = index;
+		console.log(inBetween);
+	}
+
+	function array_move(arr, old_index, new_index) {
+	    if (new_index >= arr.length) {
+	        var k = new_index - arr.length + 1;
+	        while (k--) {
+	            arr.push(undefined);
+	        }
+	    }
+	    arr.splice(new_index+1, 0, arr.splice(old_index, 1)[0]);
+	    return arr; // for testing
+	};
+
+	function dragrightlist(ev) {
+	  ev.dataTransfer.setData("text", ev.target.id);
+	}
+
+	// Swap list items that are drag and drop
+	function swapItems(ev, el, toIndex) {
+	  ev.preventDefault();
+	  var data = ev.dataTransfer.getData("text");
+      if (!data.includes("choice")) {
+
+      	var draggablechoice = document.getElementsByClassName("draggable-choice");
+      	var newitem = document.getElementById(data);
+      	listItems[draggablechoice.length] = newitem.getElementsByTagName("label")[0];
+      	for(var e = 0; e < draggablechoice.length; e++) {
+      		listItems[e] = draggablechoice[e].getElementsByTagName("label")[0];
+      		listItemButton1[e] = draggablechoice[e].getElementsByTagName("button")[0];
+      		listItemButton2[e] = draggablechoice[e].getElementsByTagName("button")[1];
+      	}
+      	
+      	var newitemLabel = newitem.getElementsByTagName("label")[0];
+      	var newitemButton1 = newitem.getElementsByTagName("button")[0];
+      	var newitemButton2 = newitem.getElementsByTagName("button")[1];
+      	newitemButton1.id = newitemButton1.id + "choice";
+      	newitemButton2.id = newitemButton2.id + "choice";
+      	listItems[draggablechoice.length] = newitemLabel;
+      	listItemButton1[draggablechoice.length] = newitemButton1;
+      	listItemButton2[draggablechoice.length] = newitemButton2;
+      	newIndex = toIndex;
+      	console.log(listItems);
+      	console.log(listItemButton1);
+      	console.log(listItemButton2);
+      } else {
+      	var fromIndex = document.getElementById(data).getAttribute('data-index');
+		  var draggablechoice = document.getElementsByClassName("draggable-choice");
+
+		  var fromContent = document.getElementById(data);
+		  var fromLabelcontent = fromContent.getElementsByTagName("label")[0];
+		  var fromButtoncontent = fromContent.getElementsByTagName("button")[0];
+		  var fromButtoncontent2 = fromContent.getElementsByTagName("button")[1];
+
+		  var toContent = draggablechoice[toIndex];
+		  var toLabelcontent = toContent.getElementsByTagName("label")[0];
+		  var toButtoncontent = toContent.getElementsByTagName("button")[0];
+		  var toButtoncontent2 = toContent.getElementsByTagName("button")[1];
+
+		  draggablechoice[fromIndex].appendChild(toLabelcontent);
+		  draggablechoice[fromIndex].appendChild(toButtoncontent);
+		  draggablechoice[fromIndex].appendChild(toButtoncontent2);
+		  draggablechoice[toIndex].appendChild(fromLabelcontent);
+		  draggablechoice[toIndex].appendChild(fromButtoncontent);
+		  draggablechoice[toIndex].appendChild(fromButtoncontent2);
+
+		  //document.getElementById(fromButtoncontent.id).setAttribute('onclick',  "deleteItem('" + toContent.id + "', '" + fromButtoncontent.id + "')");
+
+		  fromButtoncontent.setAttribute('onclick',  "deleteItem2('" + toContent.id + "', '" + toButtoncontent.id + "')");
+		  toButtoncontent.setAttribute('onclick',  "deleteItem2('" + fromContent.id + "', '" + fromButtoncontent.id + "')");
+		  //const itemOne = listItems[fromIndex].querySelector('.draggable-choice');
+		  //const itemTwo = listItems[toIndex].querySelector('.draggable-choice');
+		  //const itemOne = draggablechoice[fromIndex];
+		  //const itemTwo = draggablechoice[toIndex];
+		  //alert(itemOne);
+		  //alert(itemTwo);
+		  //draggablechoice[fromIndex].appendChild(itemTwo);
+		  //draggablechoice[toIndex].appendChild(itemOne);
+      }	
+	}
+
+	function deleteItem(itemid, buttonid) {
+		var dataindex = document.getElementById(itemid).getAttribute('data-index');
+		document.getElementsByClassName("drag-point-in-between")[dataindex].remove();
+		document.getElementById(itemid).remove();
+		//document.getElementById(buttonid).style.display = 'none';
+	}
+
+	function deleteItem2(itemid, buttonid) {
+		var dataindex = document.getElementById(itemid).getAttribute('data-index');
+		document.getElementsByClassName("drag-point-in-between")[dataindex].remove();
+		document.getElementById(itemid).remove();
+		//document.getElementById(buttonid).style.display = 'none';
+	}
+
+	function deleteItem3(itemid, buttonid) {
+		var dataindex = document.getElementById(itemid).getAttribute('data-index');
+		document.getElementsByClassName("drag-point-in-between")[dataindex].remove();
+		document.getElementById(itemid).remove();
+		//document.getElementById(buttonid).style.display = 'none';
+	}
+
+	$('#exampleModalToggle2').on('show.bs.modal', function (event) {
+	    var button = $(event.relatedTarget); // Button that triggered the modal
+	    var exercise = button.data('exercise'); // Extract info from data-* attributes
+	    var index = button.data('index');
+	    $("#customizetitle").html(exercise);
+	    $("#paragraphindex").val(index);
+
+	    var reps = $(".draggable-choice .exercisereps").eq(index).val();
+		var rest = $(".draggable-choice .exerciserest").eq(index).val();
+		var timed = $(".draggable-choice .exercisetimed").eq(index).val();
+		var demo = $(".draggable-choice .demourl").eq(index).val();
+		var easy = $(".draggable-choice .easy_replace").eq(index).val();
+		var hard = $(".draggable-choice .hard_replace").eq(index).val();
+
+		if (timed == "true") {
+			document.getElementById("timebased").checked = true;	
+		} else {
+			document.getElementById("timebased").checked = false;
+		}
+		
+		document.getElementById("exerciselength").value = reps;
+		document.getElementById("exerciserest").value = rest;
+		document.getElementById("demourl").value = demo;
+
+		if (easy == "") {
+			document.getElementById("easy").selectedIndex = "0";
+		}
+
+		if (hard == "") {
+			document.getElementById("hard").selectedIndex = "0";
+		}
+
+	    //$("#easy option:selected").text("Choose a replacements");
+		//$("#hard option:selected").text("Choose a replacements");
+	});
+
+	$("#timebased").click(function() {
+		if (document.getElementById("timebased").checked == false) {
+			document.getElementById("exerciselength").setAttribute('placeholder',  "in reps");
+		} else {
+			document.getElementById("exerciselength").setAttribute('placeholder',  "in seconds");
+		}
+	});
+
+</script>
+
+<script type="module">
+		// Import the functions you need from the SDKs you need
+		//import { initializeApp } from "firebase/app";
+		//import { getAnalytics } from "firebase/analytics";
+		//import { firebase } from "https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js";
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+
+		// Your web app's Firebase configuration
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyAKFG042L8zzbiYPOl4KTPLjF4DM5XXvK8",
+		  authDomain: "jumprope3-a46e1.firebaseapp.com",
+		  projectId: "jumprope3-a46e1",
+		  storageBucket: "jumprope3-a46e1.appspot.com",
+		  messagingSenderId: "420559540605",
+		  appId: "1:420559540605:web:3629691e546dd924df7c14",
+		  measurementId: "G-SZ36E215QN"
+		};
+
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+		let cloudDB = firebase.firestore();
+		//const app = initializeApp(firebaseConfig);
+		//const analytics = getAnalytics(app);
+		//let cloudDB = app.firestore();
+/*
+		service firebase.storage {
+		  match /b/{bucket}/o {
+		    match /{allPaths=**} {
+		      allow read, write: if request.auth == null;
+		    }
+		  }
+		}
+*/		
+		var draggablechoice = document.getElementsByClassName("draggable-choice");
+		var today = new Date();
+
+		var datemonth = today.getMonth()+1;
+		var dateday = today.getDate();
+		var dateyear = today.getFullYear();
+
+		if(datemonth.length == 1){
+			datemonth = "0" + datemonth;
+		}
+
+		if(dateday.length == 1){
+			dateday = "0" + dateday;
+		}
+
+		var date = dateyear+'-'+datemonth+'-'+dateday;
+		console.log(date);
+		$("#save").click(function() {
+		  if(fileList == 0){
+		  	alert("Add image please!");
+		  } else {
+		  	//var bootcamp_array = [name=>"",level=>"",desc=>"",exercise=>""];
+			  //var exercise_array = [name=>"",reps=>"",rest=>"",timed=>"",demourl=>""];
+			  var bootcamp_array = [];
+			  var exercise_array = [];
+			  var exercisename = "";
+			  var exercisereps = 0;
+			  var exerciserest = 0;
+			  var exercisetimed = "";
+			  var demoLink = "";
+			  var easy_replace = "";
+			  var hard_replace = "";
+
+			  for(var x = 0; x < draggablechoice.length; x++) {
+			  	  exercisename = draggablechoice[x].getElementsByTagName("label")[0].innerHTML.replace("&nbsp;&nbsp;", "");
+			  	  exercisereps = $(".draggable-choice .exercisereps").eq(x).val();
+			  	  exerciserest = $(".draggable-choice .exerciserest").eq(x).val();
+			  	  exercisetimed = $(".draggable-choice .exercisetimed").eq(x).val();
+			  	  demoLink = $(".draggable-choice .demourl").eq(x).val();
+			  	  easy_replace = $(".draggable-choice .easy_replace").eq(x).val();
+			  	  hard_replace = $(".draggable-choice .hard_replace").eq(x).val();
+			  	  exercise_array.push({
+				    name: exercisename,
+				    reps: exercisereps,
+				    rest: exerciserest,
+				    sets: 1,
+				    timed: exercisetimed,
+				    demourl: demoLink,
+				    easy_exer_replacement: easy_replace,
+				    hard_exer_replacement: hard_replace
+				  });  
+			  }
+
+			  bootcamp_array.push({
+				    name: document.getElementById("bootcampname").value,
+				    level: document.getElementById("bootcamplevel").value,
+				    desc: document.getElementById("bootcampdesc").value,
+				    exercise: exercise_array
+				  });  
+
+			  console.log(bootcamp_array);
+
+			  var ImageName = fileList[0]["name"];
+			  var ImageURL = "";
+			  var uploadTask = firebase.storage().ref("workouts/"+ImageName).put(fileList[0]);
+
+			  uploadTask.on('state_changed', function(snapshot){
+			  	var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+			  	document.getElementById("UploadProgress").innerHTML = 'Uploading ' + progress + '%';
+			  },
+			  function(error) {
+			  		alert('Error in saving the image');
+			  },
+			  function() {
+			  	uploadTask.snapshot.ref.getDownloadURL().then(function(url){
+			  		alert("Successfully saved the bootcamp image");
+			  		cloudDB.collection("workouts").add(
+					  		{
+					  			name: document.getElementById("bootcampname").value,
+					  			body_parts: ["whole_body"],
+					  			creation_date: date,
+					  			creator: "Coach A",
+					  			image_url: url,
+					  			length: Number(document.getElementById("totaltime").value),
+					  			level: Number(document.getElementById("bootcamplevel").value),
+					  			price: 0,
+					  			rating: 4.5,
+					  			exercises: exercise_array
+					  		}
+					  )
+					  .then(function (docRef){
+					  	console.log("Document written with ID ", docRef.id);
+					  	alert("Successfully save the bootcamp with ID " + docRef.id);
+					  	Reset();
+					  })
+					  .catch(function(error){
+					  	console.log("Error adding document", error);
+					  	alert("Error saving the bootcamp");
+					  })
+			  	})
+			  }
+			  )
+		  }
+		});
+
+</script>
+
+<script>
+	$("#modalsave").click(function() {
+		var index = document.getElementById("paragraphindex").value;
+		var timebased = document.getElementById("timebased").checked;
+		var reps = document.getElementById("exerciselength").value;
+		var rest = document.getElementById("exerciserest").value;
+		var demourl = document.getElementById("demourl").value;
+		var easy_replace = $("#easy option:selected").text();
+		var hard_replace = $("#hard option:selected").text();
+		var timeadder = 0;
+		var initialtotal = document.getElementById("totaltime").value;
+		//document.getElementsByClassName("exercisereps")[Number(index)].value = reps;
+		//document.getElementsByClassName("exerciserest")[Number(index)].value = rest;
+		//document.getElementsByClassName("exercisetimed")[Number(index)].value = timebased;
+		//document.getElementsByClassName("demourl")[Number(index)].value = demourl;
+		reps_num = Number(reps);
+		rest_num = Number(rest);
+
+		if(Number.isInteger(reps_num) == true && Number.isInteger(rest_num) == true) {
+			$(".draggable-choice .exercisereps").eq(index).val(reps);
+			$(".draggable-choice .exerciserest").eq(index).val(rest);
+			$(".draggable-choice .exercisetimed").eq(index).val(timebased);
+			$(".draggable-choice .demourl").eq(index).val(demourl);
+			$(".draggable-choice .easy_replace").eq(index).val(easy_replace);
+			$(".draggable-choice .hard_replace").eq(index).val(hard_replace);
+
+	/*
+			if(timebased == true) {
+				timeadder = Number(reps) + Number(rest);
+				document.getElementById("totaltime").value = Number(initialtotal) + timeadder;
+			} else {
+				timeadder = Number(reps) * 5 + Number(rest);
+				document.getElementById("totaltime").value = Number(initialtotal) + timeadder;
+			}
+	*/
+			var repsitems = $(".draggable-choice .exercisereps").length;
+
+			var timecounter = 0;
+
+			for (var i = 0; i < repsitems; i++) {
+				if(Number($(".draggable-choice .exercisereps").eq(i).val()) != 0) {
+					if($(".draggable-choice .exercisetimed").eq(i).val() == "true") {
+						timecounter = timecounter + Number($(".draggable-choice .exercisereps").eq(i).val()) + Number($(".draggable-choice .exerciserest").eq(i).val());
+					} else {
+						timecounter = timecounter + (Number($(".draggable-choice .exercisereps").eq(i).val()) * 5) + Number($(".draggable-choice .exerciserest").eq(i).val());
+					}
+				}
+			}
+
+			if(timecounter <= 60) {
+				timecounter = 1;
+				document.getElementById("totaltime").value = timecounter;
+			} else {
+				timecounter = Math.floor(timecounter / 60);
+				document.getElementById("totaltime").value = timecounter;
+			}
+
+			alert("Successfully updated " + document.getElementById("customizetitle").innerHTML.replace("&nbsp;&nbsp;", "") + " exercise!");
+			$("#exampleModalToggle2").modal("hide");
+		
+		} else {
+			alert("Invalid number format!");
+		}
+
+	});
+		
+</script>
+
+<script type="text/javascript">
+	function Reset() {
+		location.reload();
+	}
+</script>
+
